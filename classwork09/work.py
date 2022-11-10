@@ -1,5 +1,5 @@
 import pygame
-from pygame.draw import *
+from pygame.draw import line, circle, rect
 from random import randint
 pygame.init()
 
