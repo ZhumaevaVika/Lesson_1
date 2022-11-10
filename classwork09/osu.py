@@ -130,7 +130,7 @@ def game_over(balls):
 
 
 def save_score(score):
-    """ Saving score"""
+    """ Saving score """
     with open("score.txt", "r") as f:
         scor = f.readlines()
         scor = list(map(lambda x: int(x.rstrip()), scor))
