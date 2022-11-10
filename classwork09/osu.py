@@ -4,22 +4,22 @@ from random import randint
 pygame.init()
 
 FPS = 150
-FRAME_COUNT = 0
-SCORE = 0
-ACCURACY = 0.0
 POINT = 50
-COMBO = 0
 K_COMBO = 0.01
-COMBO_BREAK = 1
-MISSES = 0
-DRAW_MISS = 0
-TARGET_COUNT = 0
-POS_X_PREV = 0
-POS_Y_PREV = 0
-IS_GAMEOVER = 0
+frame_count = 0
+score = 0
+accuracy = 0.0
+combo = 0
+combo_break = 1
+misses = 0
+draw_miss = 0
+target_count = 0
+pos_x_prev = 0
+pos_y_prev = 0
+is_gameover = 0
 pos_x = 0
 pos_y = 0
-BALLS = []
+Balls = []
 
 screen = pygame.display.set_mode((1200, 900))
 
@@ -34,15 +34,15 @@ WHITE = (255, 255, 255)
 COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 
 
-def draw_miss(pos_x, pos_y):
+def draws_miss(pos_x, pos_y):
     """ Render misses in display """
-    global POS_X_PREV, POS_Y_PREV
-    line(screen, BLACK, (POS_X_PREV - 10, POS_Y_PREV - 10), (POS_X_PREV + 10, POS_Y_PREV + 10), 10)
-    line(screen, BLACK, (POS_X_PREV + 10, POS_Y_PREV - 10), (POS_X_PREV - 10, POS_Y_PREV + 10), 10)
+    global pos_x_prev, pos_y_prev
+    line(screen, BLACK, (pos_x_prev - 10, pos_y_prev - 10), (pos_x_prev + 10, pos_y_prev + 10), 10)
+    line(screen, BLACK, (pos_x_prev + 10, pos_y_prev - 10), (pos_x_prev - 10, pos_y_prev + 10), 10)
     line(screen, RED, (pos_x-10, pos_y-10), (pos_x+10, pos_y+10), 10)
     line(screen, RED, (pos_x + 10, pos_y - 10), (pos_x - 10, pos_y + 10), 10)
-    POS_X_PREV = pos_x
-    POS_Y_PREV = pos_y
+    pos_x_prev = pos_x
+    pos_y_prev = pos_y
 def update_screen(balls, pos_x=0, pos_y=0):
     """ Render balls in display """
     screen.fill(BLACK)
@@ -50,11 +50,11 @@ def update_screen(balls, pos_x=0, pos_y=0):
         circle(screen, ball[3], (ball[0], ball[1]), ball[2])
         circle(screen, tuple(0.5 * i for i in ball[3]), (ball[0], ball[1]), ball[2]/ 1.25)
         circle(screen, tuple(0.33 * i for i in ball[3]), (ball[0], ball[1]), ball[2] / 2)
-    if DRAW_MISS == 1:
-        draw_miss(pos_x, pos_y)
+    if draw_miss == 1:
+        draws_miss(pos_x, pos_y)
 def text_update(score=0, accuracy=0.0, combo=0):
     """ Render text in display """
-    global IS_GAMEOVER
+    global is_gameover
     font = pygame.font.Font('freesansbold.ttf', 32)
     rect(screen, BLACK, (860, 50, 350, 100))
     rect(screen, BLACK, (30, 775, 200, 50))
@@ -67,7 +67,7 @@ def text_update(score=0, accuracy=0.0, combo=0):
     combo = 'COMBO  ' + str(combo)
     text = font.render(combo, True, WHITE)
     screen.blit(text, (30, 775))
-    if IS_GAMEOVER == 1:
+    if is_gameover == 1:
         font = pygame.font.Font('freesansbold.ttf', 128)
         death = 'YOU DIED'
         text = font.render(death, True, RED)
@@ -100,7 +100,7 @@ def new_ball():
     circle(screen, tuple(0.5*i for i in color), (x, y), r/1.25)
     circle(screen, tuple(0.33*i for i in color), (x, y), r/2)
     is_move = randint(0, 2)
-    BALLS.append([x, y, r, color, speed_x, speed_y, is_move])
+    Balls.append([x, y, r, color, speed_x, speed_y, is_move])
 def move_ball(balls):
     """ Moves a ball """
     for ball in balls:
@@ -122,11 +122,11 @@ def click(event):
 
 def game_over(balls):
     """ Checks the end of the game """
-    global IS_GAMEOVER, finished
+    global is_gameover, finished
     if len(balls) > 4:
         screen.fill(BLACK)
         finished = True
-        IS_GAMEOVER = 1
+        is_gameover = 1
 
 
 def save_score(score):
@@ -147,42 +147,42 @@ finished = False
 
 while not finished:
     clock.tick(FPS)
-    FRAME_COUNT += 1
-    update_screen(BALLS, pos_x, pos_y)
-    text_update(SCORE, ACCURACY, COMBO)
-    move_ball(BALLS)
+    frame_count += 1
+    update_screen(Balls, pos_x, pos_y)
+    text_update(score, accuracy, combo)
+    move_ball(Balls)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             finished = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
             click(0)
-            TARGET_COUNT += 1
+            target_count += 1
             pos_x, pos_y = event.pos
-            for ball in BALLS:
+            for ball in Balls:
                 if (pos_x-ball[0])**2+(pos_y-ball[1])**2 < ball[2]**2:
-                    COMBO_BREAK = 0
-                    BALLS.remove(ball)
-                    COMBO += 1
-                    DRAW_MISS = 0
-                    SCORE += weigh_point(COMBO)
+                    combo_break = 0
+                    Balls.remove(ball)
+                    combo += 1
+                    draw_miss = 0
+                    score += weigh_point(combo)
                     if (pos_x-ball[0])**2+(pos_y-ball[1])**2 < (ball[2]/1.25)**2:
-                        SCORE += weigh_point(COMBO)
+                        score += weigh_point(combo)
                         if (pos_x-ball[0])**2 + (pos_y-ball[1])**2 < (ball[2]/2)**2:
-                            SCORE += 2*weigh_point(COMBO)
-            if COMBO_BREAK == 1:
-                MISSES += 1
-                COMBO = 0
-                DRAW_MISS = 1
-            COMBO_BREAK = 1
-            ACCURACY = weigh_accuracy(SCORE, TARGET_COUNT, MISSES)
-    if FRAME_COUNT % 60 == 0:
-        FRAME_COUNT = 0
+                            score += 2*weigh_point(combo)
+            if combo_break == 1:
+                misses += 1
+                combo = 0
+                draw_miss = 1
+            combo_break = 1
+            accuracy = weigh_accuracy(score, target_count, misses)
+    if frame_count % 60 == 0:
+        frame_count = 0
         new_ball()
-    game_over(BALLS)
+    game_over(Balls)
     pygame.display.update()
 
-text_update(SCORE, ACCURACY, COMBO)
-save_score(SCORE)
+text_update(score, accuracy, combo)
+save_score(score)
 finished = False
 
 while not finished:
