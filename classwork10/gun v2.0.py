@@ -21,7 +21,6 @@ GAME_COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 
 WIDTH = 800
 HEIGHT = 600
-# Что значит 'Shadows name 'screen' from outer scope'? Почему подчеркивает screen, event и bull?
 
 
 class Ball:
@@ -50,20 +49,17 @@ class Ball:
         self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
         и стен по краям окна (размер окна 800х600).
         """
-        # Плохая физика отскока от нижней стенки. Работает через раз. Как исправить?
+        if (WIDTH - self.x) <= self.r:
+            self.x = WIDTH - self.r
+            self.vx = -self.vx / 2
+        if (HEIGHT - self.y) <= self.r:
+            self.y = HEIGHT - self.r
+            self.vy = (-self.vy) / 1.6
+            self.vx = (self.vx) / 2
+        self.vy -= 1
         self.x += self.vx
         self.y -= self.vy
-        self.vy -= 2
-        if self.r+25 > self.x or self.x > 800-self.r-25:
-            self.vx *= -0.8
-        if self.y > 600-self.r-25:
-            self.vy *= -0.5
-            self.vx *= 0.8
-            if -2 < self.vy < 2:
-                self.vy = 0
-            if -0.1 < self.vx < 0.1:
-                self.vx = 0
-        if (self.vy == 0) and (self.vx == 0):
+        if (-1 < self.vy < 1) and (-1 < self.vx < 1):
             self.live += 1
             if self.live > 30:
                 self.live = 0
@@ -175,8 +171,8 @@ class Target:
         self.live = 1
         self.bullet = 0
         self.time = 0
-        self.vx = randint(-150, 100) / 100
-        self.vy = randint(-150, 100) / 100
+        self.vx = randint(-150, 100) / 50
+        self.vy = randint(-150, 100) / 50
 
     def target_in_array(self, targets):
         if len(targets<2):
@@ -186,9 +182,9 @@ class Target:
     def move(self):
         self.x += self.vx
         self.y += self.vy
-        if self.x < 600+self.r or 800-self.r < self.x:
+        if self.x < 500+self.r or WIDTH-self.r < self.x:
             self.vx *= -1
-        if self.y < self.r or 800-self.r < self.y:
+        if self.y < self.r or HEIGHT-self.r < self.y:
             self.vy *= -1
 
     def hit(self):
